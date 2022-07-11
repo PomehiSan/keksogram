@@ -24,82 +24,77 @@ const testMessages = [
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!',
 ]
 
-const commentsGenerator = (array) => {
+const commentsGenerator = () => {
+  let usedCommentsIdArray = [];
+  let usedAvatarsArray = [];
 
-  const getCommentId = () => {
-    let commentId = null;
-    let isCommentIdIsAlready = true;
-    const usedCommentId = array.map((comment) => comment.id);
+  return () => {
+    const getCommentId = () => {
+      let commentId = getRandomNumber(1, MAX_COMMENT_ID);
 
-    while (isCommentIdIsAlready) {
-      commentId = getRandomNumber(1, MAX_COMMENT_ID);
-
-      if(!(usedCommentId.find((id) => id === commentId))) {
-        isCommentIdIsAlready = false;
+      while (usedCommentsIdArray.includes(commentId)) {
+        commentId = getRandomNumber(1, MAX_COMMENT_ID);
       }
+
+      usedCommentsIdArray.push(commentId);
+      return commentId;
     }
 
-    return commentId;
-  }
-
-  const getAvatar = () => {
-    const avatars = new Array(AVATARS_COUNT).fill('');
-    for (let i = 0; i < avatars.length; i++) {
-      avatars[i] = `img/avatar-${i + 1}.svg`;
-    }
-
-    let avatar = '';
-    const usedAvatars = array.map((comment) => comment.avatar);
-    let avatarIsAlready = true;
-    while(avatarIsAlready) {
-      avatar = getRandomElement(avatars);
-      if(!(usedAvatars.find((photo) => photo === avatar))) {
-        avatarIsAlready = false;
+    const getAvatar = () => {
+      const avatars = new Array(AVATARS_COUNT).fill('');
+      for (let i = 0; i < avatars.length; i++) {
+        avatars[i] = `img/avatar-${i + 1}.svg`;
       }
-    }
-    return avatar;
-  };
 
-  const getMessages = () => {
-    const messagesArray = new Array(getRandomNumber(1, MAX_MESSAGE)).fill('');
-    messagesArray[0] = getRandomElement(testMessages);
+      let avatar = getRandomElement(avatars);
 
-    if(messagesArray.length > 1) {
-      for (let i = 1; i < messagesArray.length; i++) {
-        let newMessage = '';
-        let messageIsAlready = true;
-        while (messageIsAlready) {
-          newMessage = getRandomElement(testMessages);
+      while(usedAvatarsArray.includes(avatar)) {
+        avatar = getRandomElement(avatars);
+      }
 
-          if(!(messagesArray.find((message) => message === newMessage))) {
-            messageIsAlready = false;
+      usedAvatarsArray.push(avatar);
+      return avatar;
+    };
+
+    const getMessages = () => {
+      const messagesArray = new Array(getRandomNumber(1, MAX_MESSAGE)).fill('');
+      messagesArray[0] = getRandomElement(testMessages);
+
+      if(messagesArray.length > 1) {
+        for (let i = 1; i < messagesArray.length; i++) {
+          let newMessage = getRandomElement(testMessages);
+
+          while (messagesArray.includes(newMessage)) {
+            newMessage = getRandomElement(testMessages);
           }
+
+          messagesArray[i] = newMessage;
         }
-        messagesArray[i] = newMessage;
       }
+
+      const messages = messagesArray.join(' ');
+
+      return messages;
+    };
+
+    const comment = {
+      id: getCommentId(),
+      avatar: getAvatar(),
+      message: getMessages(),
+      name: getRandomElement(testNames),
     }
 
-    const messages = messagesArray.join(' ');
-
-    return messages;
-  };
-
-
-  const comment = {
-    id: getCommentId(),
-    avatar: getAvatar(),
-    message: getMessages(),
-    name: getRandomElement(testNames),
+    return comment;
   }
-
-  return comment;
 }
 
 const getComments = () => {
+  const getComment = commentsGenerator();
+
   const comments = new Array(getRandomNumber(MIN_COMMENTS, MAX_COMMENTS)).fill('');
 
   for (let i = 0; i < comments.length; i++) {
-    comments[i] = commentsGenerator(comments)
+    comments[i] = getComment();
   }
 
   return comments;
