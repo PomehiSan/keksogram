@@ -20,6 +20,12 @@ const isCommentRigthLength = (comment, maxLength) => {
   return false;
 }
 
+const isEscEvent = (evt) => {
+  return evt.key === 'Escape' || evt.key === 'Esc';
+}
+
+export { isEscEvent };
+
 const getRandomElement = (array) => {
   return array[getRandomNumber(0, array.length - 1)];
 }
