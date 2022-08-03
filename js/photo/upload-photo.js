@@ -1,76 +1,66 @@
+import { onCloseOverlay } from './popup.js'
 import { isEscEvent } from '../util.js';
 
-const upload = document.querySelector('.img-upload__input');
-const overlay = document.querySelector('.img-upload__overlay');
-const overlayClose = overlay.querySelector('.img-upload__cancel');
-const hashTagField = document.querySelector('.text__hashtags');
-const discriptionField = document.querySelector('.text__description');
 const form = document.querySelector('.img-upload__form');
+const successTemplate = document.querySelector('#success').content.children[0];
+const errorTemplate = document.querySelector('#error').content.children[0];
 const body = document.querySelector('body');
-const uploadPreview = document.querySelector('.img-upload__preview').children[0];
-export { uploadPreview };
 
-let blockEscClose = false;
-hashTagField.addEventListener('focus', () => { blockEscClose = true });
-hashTagField.addEventListener('blur', () => { blockEscClose = false });
-discriptionField.addEventListener('focus',  () => { blockEscClose = true });
-discriptionField.addEventListener('blur', () => { blockEscClose = false });
+const closeResultBlock = (element) => {
+  const closeButton = element.querySelector('button');
+  closeButton.addEventListener('click', () => {
+    element.remove()
+  })
 
-const photoStyles = {
-  photoFilter: '',
-  photoScale: '',
-};
-
-const resetPhotoStyles = () => {
-  for (let style in photoStyles) {
-    photoStyles[style] = '';
+  const EscClose = () => {
+    return (evt) => {
+      if(isEscEvent(evt)) {
+        element.remove();
+        body.removeEventListener('keydown', EscClose);
+      }
+    }
   }
-  editPhoto(photoStyles);
-};
 
-const editPhoto = (styles) => {
-  if(styles.filter) photoStyles.photoFilter = styles.filter;
-  if(styles.scale) photoStyles.photoScale = styles.scale;
-  uploadPreview.style = `${photoStyles.photoScale}; ${photoStyles.photoFilter}`;
-};
+  body.addEventListener('keydown', EscClose());
 
-export { editPhoto };
-
-let openEvents;
-let closeEvents;
-const setEvents = (start, stop) => {
-  openEvents = start;
-  closeEvents = stop;
-};
-export { setEvents };
-
-const onOpenOverlay = () => {
-  overlay.classList.remove('hidden');
-  body.classList.add('modal-open');
-  openEvents.forEach(element => {
-    element();
+  element.addEventListener('click', (evt) => {
+    if(evt.target.classList.contains(element.classList.value)) {
+      element.remove();
+    }
   });
-  overlayClose.addEventListener('click', onCloseOverlay);
-  document.addEventListener('keydown', onEscKeyDown);
+}
+
+const isSuccess = () => {
+  const succesBlock = successTemplate.cloneNode(true);
+  body.insertAdjacentElement('afterend', succesBlock);
+
+  closeResultBlock(succesBlock);
 };
 
-const onCloseOverlay = () => {
-  overlay.classList.add('hidden');
-  body.classList.remove('modal-open');
-  resetPhotoStyles();
-  upload.value = '';
-  closeEvents.forEach(element => {
-    element();
-  });
+const isError = () => {
+  const errorBlock = errorTemplate.cloneNode(true);
+  body.insertAdjacentElement('afterend', errorBlock);
+
+  closeResultBlock(errorBlock);
 };
 
-const onEscKeyDown = (evt) => {
-  if(isEscEvent(evt) && !blockEscClose) onCloseOverlay();
-};
+const uploadPhoto = async (url) => {
+  let response;
+  try {
+    response = await fetch(url, {
+      method: 'post',
+      body: new FormData(form),
+    });
+  } catch(err) {
+    isError()
+  }
 
-upload.addEventListener('change', onOpenOverlay);
+  if(response.ok) isSuccess();
+  else isError();
+}
 
 form.addEventListener('submit', (evt) => {
   evt.preventDefault();
+  uploadPhoto('https://23.javascript.pages.academy/kekstagram');
   onCloseOverlay();
 });

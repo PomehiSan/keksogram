@@ -12,5 +12,6 @@ extends:
   "htmlacademy/vanilla"
 
 "globals": {
-  "noUiSlider": true
+  "noUiSlider": true,
+  "_": true
 }

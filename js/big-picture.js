@@ -1,5 +1,7 @@
 import { isEscEvent } from './util.js'
 
+const COUNT_VIEW_COMMENTS = 5;
+
 const page = document.querySelector('body');
 const picture = document.querySelector('.big-picture');
 const image = picture.querySelector('.big-picture__img').children[0];
@@ -8,6 +10,7 @@ const commentsCount = picture.querySelector('.comments-count');
 const comments = picture.querySelector('.social__comments');
 const description = picture.querySelector('.social__caption');
 const commentsCountElement = picture.querySelector('.social__comment-count');
+const commentsCountCurrent = picture.querySelector('.comments-count-current');
 const commentLoader = picture.querySelector('.comments-loader');
 const closePictureButton = picture.querySelector('.big-picture__cancel');
 
@@ -32,10 +35,21 @@ const createCommentElement = (postComment) => {
   return comment;
 };
 
-const getComments = (post) => {
+const getComments = (post, all) => {
+  commentsCountCurrent.textContent = post.comments.length;
+
+  if(post.comments.length > COUNT_VIEW_COMMENTS) {
+    commentsCountCurrent.textContent = COUNT_VIEW_COMMENTS;
+    commentLoader.classList.remove('hidden');
+  }
 
   const commentsFragment = document.createDocumentFragment();
   for(let i = 0; i < post.comments.length; i++) {
+    if(!all && i >= COUNT_VIEW_COMMENTS) {
+      break;
+    } else if (all && i < COUNT_VIEW_COMMENTS) {
+      continue;
+    }
     commentsFragment.appendChild(createCommentElement(post.comments[i]));
   }
 
@@ -51,19 +65,24 @@ const onEscKeyDown = (evt) => {
 const openBigPicture = (post) => {
   return (evt) => {
     evt.preventDefault();
+    commentLoader.classList.add('hidden');
 
     image.src = post.url;
     likes.textContent = post.likes;
     commentsCount.textContent = post.comments.length;
     description.textContent = post.description;
     comments.innerHTML = '';
-    comments.appendChild(getComments(post));
+    comments.appendChild(getComments(post, false));
+
 
     page.classList.add('modal-open');
-    commentsCountElement.classList.add('hidden');
-    commentLoader.classList.add('hidden');
     picture.classList.remove('hidden');
 
+    commentLoader.addEventListener('click', () => {
+      comments.appendChild(getComments(post, true));
+      commentsCountCurrent.textContent = post.comments.length;
+      commentLoader.classList.add('hidden');
+    });
     closePictureButton.addEventListener('click', closeBigPicture);
     document.addEventListener('keydown', onEscKeyDown);
   }

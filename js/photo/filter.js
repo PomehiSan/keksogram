@@ -1,11 +1,12 @@
-import { uploadPreview, editPhoto } from './upload-photo.js';
+import { editPhoto } from './editor.js';
 
+const uploadPreview = document.querySelector('.img-upload__preview').children[0];
 const effects = document.querySelector('.effects__list');
 const effectBlock = document.querySelector('.effect-level');
 const effectValue = effectBlock.querySelector('.effect-level__value');
 const effectRange = effectBlock.querySelector('.effect-level__slider');
 
-effectRange.classList.add('hidden');
+effectBlock.classList.add('hidden');
 effectValue.setAttribute('value', 0);
 
 noUiSlider.create(effectRange, {
@@ -96,9 +97,9 @@ const changeFilter = (evt) => {
   rangeToggle(evt.target.value);
 
   if(evt.target.value === 'none'){
-    if(!effectRange.classList.contains('hidden')) effectRange.classList.add('hidden');
+    if(!effectBlock.classList.contains('hidden')) effectBlock.classList.add('hidden');
   } else {
-    if(effectRange.classList.contains('hidden')) effectRange.classList.remove('hidden');
+    if(effectBlock.classList.contains('hidden')) effectBlock.classList.remove('hidden');
   }
 };
 
@@ -114,7 +115,7 @@ const resetPhotoFilter = () => {
   effectValue.setAttribute('value', 0);
   effectRange.noUiSlider.off('update');
   effects.removeEventListener('change', changeFilter);
-  if(!effectRange.classList.contains('hidden')) effectRange.classList.add('hidden');
+  if(!effectBlock.classList.contains('hidden')) effectBlock.classList.add('hidden');
 };
 
 export { resetPhotoFilter };

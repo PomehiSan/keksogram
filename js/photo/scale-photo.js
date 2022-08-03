@@ -1,4 +1,4 @@
-import { editPhoto } from './upload-photo.js';
+import { editPhoto } from './editor.js';
 
 const scale = document.querySelector('.img-upload__scale');
 const smallerButton = scale.querySelector('.scale__control--smaller');
