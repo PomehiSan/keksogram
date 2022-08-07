@@ -1,5 +1,8 @@
 import { isEscEvent } from '../util.js';
 import { resetPhotoStyles } from './editor.js'
+import { openPhotoEdit, resetPhotoEdit } from './scale-photo.js';
+import { openPhotoFilter, resetPhotoFilter } from './filter.js';
+import { resetFields } from './validation.js';
 
 const FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
 
@@ -16,14 +19,6 @@ hashTagField.addEventListener('focus', () => { blockEscClose = true });
 hashTagField.addEventListener('blur', () => { blockEscClose = false });
 discriptionField.addEventListener('focus',  () => { blockEscClose = true });
 discriptionField.addEventListener('blur', () => { blockEscClose = false });
-
-let openEvents;
-let closeEvents;
-const setEvents = (start, stop) => {
-  openEvents = start;
-  closeEvents = stop;
-};
-export { setEvents };
 
 const setPreview = () => {
   const file = upload.files[0];
@@ -48,9 +43,8 @@ const onOpenOverlay = () => {
   setPreview()
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
-  openEvents.forEach(element => {
-    element();
-  });
+  openPhotoEdit();
+  openPhotoFilter();
   overlayClose.addEventListener('click', onCloseOverlay);
   document.addEventListener('keydown', onEscKeyDown);
 };
@@ -60,9 +54,9 @@ const onCloseOverlay = () => {
   body.classList.remove('modal-open');
   resetPhotoStyles();
   upload.value = '';
-  closeEvents.forEach(element => {
-    element();
-  });
+  resetPhotoEdit();
+  resetPhotoFilter();
+  resetFields();
 };
 
 export { onCloseOverlay };

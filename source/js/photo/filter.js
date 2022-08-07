@@ -1,4 +1,6 @@
 import { editPhoto } from './editor.js';
+import noUiSlider from 'nouislider';
+import 'nouislider/dist/nouislider.css';
 
 const uploadPreview = document.querySelector('.img-upload__preview').children[0];
 const effects = document.querySelector('.effects__list');

@@ -1,4 +1,4 @@
-import { onCloseOverlay } from './popup.js'
+import { onCloseOverlay } from './popup.js';
 import { isEscEvent } from '../util.js';
 
 const form = document.querySelector('.img-upload__form');

@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { loadPosts } from './preview.js';
 import { getRandomElement } from './util.js';
 
